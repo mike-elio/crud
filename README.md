@@ -38,7 +38,7 @@ content-type: application/json
 {"id":4,"title":"Buy milk via curl","done":false}
 ```
 
-The complete check results for both Swagger UI and `curl -i` are in [results.html](results.html).
+The complete check results for both Swagger UI and `curl -i` are in [results.html](results.html). A printable copy is available as [PDF](output/pdf/task-api-crud-results.pdf).
 
 ## Swagger UI
 

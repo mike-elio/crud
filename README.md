@@ -44,4 +44,7 @@ The complete check results for both Swagger UI and `curl -i` are in [results.htm
 
 The API exposes all five endpoints in Swagger UI. POST and PUT show request body editors; DELETE has no request body.
 
-The full CRUD cycle was exercised with Swagger UI's **Try it out**. A screenshot could not be exported from this environment, so no image is included yet.
+The full CRUD cycle was exercised with Swagger UI's **Try it out**. More screenshots of the requests and responses are in [results.html](results.html).
+
+![Swagger UI showing all five task endpoints](Screenshot%202026-09-25%20231518.png)
+

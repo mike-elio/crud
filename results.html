@@ -15,6 +15,9 @@
     code { font-family: ui-monospace, Consolas, monospace; }
     details { margin: 14px 0; border: 1px solid #ccd5df; border-radius: 8px; padding: 10px 14px; }
     summary { cursor: pointer; font-weight: 700; }
+    figure { margin: 24px 0; }
+    figure img { display: block; max-width: 100%; height: auto; border: 1px solid #ccd5df; border-radius: 8px; }
+    figcaption { margin-top: 8px; color: #475569; }
   </style>
 </head>
 <body>
@@ -171,8 +174,40 @@ ea13884 Initial commit</code></pre>
     <p><a href="https://github.com/mike-elio/crud">Open the public repository</a>. Its README documents installation, one run command, endpoints, and a captured curl response.</p>
   </details>
 
-  <h2>Screenshot</h2>
-  <p>The Swagger UI CRUD cycle was completed with “Try it out”. The browser screenshot was captured, but this environment did not allow exporting it as a local file.</p>
+  <h2>Swagger UI screenshots</h2>
+  <p>These screenshots show additional “Try it out” examples on port 8000. Some examples use different task IDs from the verified CRUD cycle above.</p>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231518.png" alt="Swagger UI showing GET, POST, PUT, and DELETE task routes">
+    <figcaption>All five task endpoints appear in Swagger UI.</figcaption>
+  </figure>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231638.png" alt="POST tasks request body editor containing a title">
+    <figcaption>POST /tasks has a JSON request body editor.</figcaption>
+  </figure>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231701.png" alt="POST tasks response showing HTTP 201 and the created task">
+    <figcaption>POST /tasks created a task with status 201.</figcaption>
+  </figure>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231545.png" alt="GET tasks response showing HTTP 200 and the tasks list">
+    <figcaption>GET /tasks returned the in-memory list with status 200.</figcaption>
+  </figure>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231724.png" alt="GET task by id parameters in Swagger UI">
+    <figcaption>GET /tasks/{id} exposes the required path parameter.</figcaption>
+  </figure>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231801.png" alt="GET task by id response showing HTTP 200">
+    <figcaption>GET /tasks/2 returned an individual task with status 200.</figcaption>
+  </figure>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231854.png" alt="PUT task response showing HTTP 200 and updated title and done">
+    <figcaption>PUT /tasks/2 updated title and done with status 200.</figcaption>
+  </figure>
+  <figure>
+    <img src="Screenshot%202026-09-25%20231930.png" alt="DELETE task response showing HTTP 204 without a response body">
+    <figcaption>DELETE /tasks/3 returned 204 with no response body.</figcaption>
+  </figure>
 </body>
 </html>
 

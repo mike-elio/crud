@@ -13,6 +13,8 @@
     th { background: #f1f5f9; }
     pre { overflow-x: auto; background: #111827; color: #e5e7eb; padding: 16px; border-radius: 8px; }
     code { font-family: ui-monospace, Consolas, monospace; }
+    details { margin: 14px 0; border: 1px solid #ccd5df; border-radius: 8px; padding: 10px 14px; }
+    summary { cursor: pointer; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -49,7 +51,128 @@ content-type: application/json
 
 {"id":4,"title":"Buy milk via curl","done":false}</code></pre>
 
+  <h2>Terminal input and output by stage</h2>
+  <p>Stages 0–3 were run from their original local commit snapshots on temporary servers. Stage 4 used the final API. Stage 6 was checked from a fresh clone of the public repository. The response blocks show the status, content type, and body from the actual terminal output; date and content length headers are omitted for readability.</p>
+
+  <details>
+    <summary>Stage 0 — Hello server</summary>
+    <pre><code>$ curl.exe -i -s http://127.0.0.1:8100/
+HTTP/1.1 200 OK
+content-type: application/json
+
+{"message":"Hello World"}</code></pre>
+  </details>
+
+  <details>
+    <summary>Stage 1 — Root and health endpoints</summary>
+    <pre><code>$ curl.exe -i -s http://127.0.0.1:8101/Tasks
+HTTP/1.1 200 OK
+content-type: application/json
+
+{"name":"Task API","version":"1.0","endpoints":["/Tasks"]}
+
+$ curl.exe -i -s http://127.0.0.1:8101/health
+HTTP/1.1 200 OK
+content-type: application/json
+
+{"status":"ok"}</code></pre>
+  </details>
+
+  <details>
+    <summary>Stage 2 — List and read tasks</summary>
+    <pre><code>$ curl.exe -i -s http://127.0.0.1:8102/tasks
+HTTP/1.1 200 OK
+content-type: application/json
+
+[{"id":1,"title":"Learn FastAPI","done":false},{"id":2,"title":"Build REST API","done":true},{"id":3,"title":"Practice Python","done":false}]
+
+$ curl.exe -i -s http://127.0.0.1:8102/tasks/1
+HTTP/1.1 200 OK
+content-type: application/json
+
+{"error":"Task 1 not found"}</code></pre>
+    <p>The Stage 2 read endpoint had a bug: it returned an error message with status 200 for an existing task. Stage 4 fixed it.</p>
+  </details>
+
+  <details>
+    <summary>Stage 3 — Create with validation</summary>
+    <pre><code>$ curl.exe -i -s -X POST http://127.0.0.1:8103/tasks -H 'Content-Type: application/json' --data-raw '{"title":"Buy milk"}'
+HTTP/1.1 201 Created
+content-type: application/json
+
+{"id":4,"title":"Buy milk","done":false}
+
+$ curl.exe -i -s -X POST http://127.0.0.1:8103/tasks -H 'Content-Type: application/json' --data-raw '{"title":""}'
+HTTP/1.1 400 Bad Request
+content-type: application/json
+
+{"detail":"Title is required and cannot be empty"}</code></pre>
+  </details>
+
+  <details open>
+    <summary>Stage 4 — Complete CRUD</summary>
+    <pre><code>$ curl.exe -i -s -X POST http://127.0.0.1:8001/tasks -H 'Content-Type: application/json' --data-raw '{"title":"Buy milk"}'
+HTTP/1.1 201 Created
+content-type: application/json
+
+{"id":4,"title":"Buy milk","done":false}
+
+$ curl.exe -i -s http://127.0.0.1:8001/tasks
+HTTP/1.1 200 OK
+content-type: application/json
+
+[{"id":1,"title":"Learn FastAPI","done":false},{"id":2,"title":"Build REST API","done":true},{"id":3,"title":"Practice Python","done":false},{"id":4,"title":"Buy milk","done":false}]
+
+$ curl.exe -i -s -X PUT http://127.0.0.1:8001/tasks/4 -H 'Content-Type: application/json' --data-raw '{"title":"Buy milk and bread","done":true}'
+HTTP/1.1 200 OK
+content-type: application/json
+
+{"id":4,"title":"Buy milk and bread","done":true}
+
+$ curl.exe -i -s -X DELETE http://127.0.0.1:8001/tasks/4
+HTTP/1.1 204 No Content
+
+$ curl.exe -i -s http://127.0.0.1:8001/tasks/4
+HTTP/1.1 404 Not Found
+content-type: application/json
+
+{"detail":"Task 4 not found"}</code></pre>
+  </details>
+
+  <details>
+    <summary>Stage 5 — Swagger UI</summary>
+    <pre><code>$ curl.exe -i -s http://127.0.0.1:8001/docs
+HTTP/1.1 200 OK
+content-type: text/html; charset=utf-8
+
+&lt;title&gt;FastAPI - Swagger UI&lt;/title&gt;
+
+$s = Invoke-RestMethod 'http://127.0.0.1:8001/openapi.json'; [pscustomobject]@{POST_body=[bool]$s.paths.'/tasks'.post.requestBody; PUT_body=[bool]$s.paths.'/tasks/{id}'.put.requestBody; DELETE_body=[bool]$s.paths.'/tasks/{id}'.delete.requestBody} | Format-List
+POST_body   : True
+PUT_body    : True
+DELETE_body : False</code></pre>
+    <p>The HTML response above shows its title. The full CRUD cycle was also completed in Swagger UI using “Try it out” as shown in the table.</p>
+  </details>
+
+  <details>
+    <summary>Stage 6 — Public GitHub repository</summary>
+    <pre><code>$ git clone --depth 10 https://github.com/mike-elio/crud.git .stage6-check
+Cloning into '.stage6-check'...
+
+$ git log --oneline -8
+012afa4 Stage 6: publish with README
+daabbb8 Stage 5: Swagger UI
+c2207fa Stage 4: complete task CRUD API
+78280be Stage 3: create with validation
+eb29759 Stage 2: list and read tasks
+6f7eb0f Stage 1: root and health endpoints
+d8df7c3 Stage 0: hello server
+ea13884 Initial commit</code></pre>
+    <p><a href="https://github.com/mike-elio/crud">Open the public repository</a>. Its README documents installation, one run command, endpoints, and a captured curl response.</p>
+  </details>
+
   <h2>Screenshot</h2>
   <p>The Swagger UI CRUD cycle was completed with “Try it out”. The browser screenshot was captured, but this environment did not allow exporting it as a local file.</p>
 </body>
 </html>
+

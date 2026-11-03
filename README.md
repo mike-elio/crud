@@ -1,50 +1,58 @@
-# In-Memory Task API
+# Task CRUD API
 
-A small FastAPI task API that stores tasks in a Python list. It supports creating, listing, reading, updating, and deleting tasks.
+A JavaScript CRUD API built with Express and SQLite (`better-sqlite3`). The database is created and seeded automatically when the app starts for the first time.
 
-## Install and run
+## Why SQLite?
 
-Run this one command from the project folder:
+SQLite stores the data in a local file and does not need a separate database server. It is a good fit for this small project and keeps setup simple.
 
-```sh
-python -m pip install fastapi uvicorn && python -m uvicorn stage2:app --reload
+## Database file
+
+The app opens `tasks.db` in the project folder when you run it from this directory. `database.js` creates the `tasks` table and inserts three example tasks if the table is empty. The database file is ignored by Git, so a fresh clone creates its own database on first run.
+
+## Start the project
+
+Install [Node.js 22 or newer](https://nodejs.org/), then run these commands from the project folder:
+
+```bash
+npm install
+npm start
 ```
 
-Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) to use Swagger UI.
+The API runs at <http://localhost:3000>. Interactive API documentation is at <http://localhost:3000/docs>.
 
 ## Endpoints
 
-| Method | Path | Purpose | Success status |
+| Method | Path | Description | Success status |
 | --- | --- | --- | --- |
+| GET | `/` | Describe the API | 200 |
+| GET | `/health` | Check server health | 200 |
 | GET | `/tasks` | List all tasks | 200 |
-| POST | `/tasks` | Create a task with `{"title":"Buy milk"}` | 201 |
-| GET | `/tasks/{id}` | Get one task | 200 |
-| PUT | `/tasks/{id}` | Update `title`, `done`, or both | 200 |
-| DELETE | `/tasks/{id}` | Delete a task; has no request body | 204 |
+| GET | `/tasks/:id` | Get one task | 200 |
+| POST | `/tasks` | Create a task with `{ "title": "Buy milk" }` | 201 |
+| PUT | `/tasks/:id` | Replace a task; send `title` and `done` | 200 |
+| PATCH | `/tasks/:id` | Partially update `title`, `done`, or both | 200 |
+| DELETE | `/tasks/:id` | Delete a task | 204 |
 
-Missing task IDs return 404. Empty or invalid POST/PUT bodies return 400.
+Unknown task IDs return 404. Invalid task data returns 400. The API converts SQLite's `0` and `1` values for `done` to JSON `false` and `true`.
 
-## `curl -i` example
+## Example SQL query
 
-This is the captured response for creating a task:
+This query was run against `tasks.db`:
 
-```http
-HTTP/1.1 201 Created
-date: Fri, 25 Sep 2026 19:49:08 GMT
-server: uvicorn
-content-length: 49
-content-type: application/json
-
-{"id":4,"title":"Buy milk via curl","done":false}
+```sql
+SELECT id, title, done FROM tasks;
 ```
 
-The complete check results for both Swagger UI and `curl -i` are in [results.html](results.html). A printable copy is available as [PDF](output/pdf/task-api-crud-results.pdf).
+It returned the three seeded rows:
 
-## Swagger UI
+```text
+1 | Learn Express | 0
+2 | Build a CRUD API | 0
+3 | Try Swagger UI | 1
+```
 
-The API exposes all five endpoints in Swagger UI. POST and PUT show request body editors; DELETE has no request body.
+## SQLite viewer screenshot
 
-The full CRUD cycle was exercised with Swagger UI's **Try it out**. More screenshots of the requests and responses are in [results.html](results.html).
-
-![Swagger UI showing all five task endpoints](Screenshot%202026-09-25%20231518.png)
+![SQLite viewer showing a query against the tasks database](docs/database-viewer.png)
 
